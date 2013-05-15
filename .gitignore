@@ -1,0 +1,12 @@
+Build
+MYMETA.*
+_build/
+blib/
+buildtmp/
+*.o
+*.swp
+*.swo
+~
+MANIFEST
+META.*
+pod2htm*.tmp

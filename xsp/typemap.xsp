@@ -1,0 +1,15 @@
+
+%typemap{AV *};
+%typemap{SV *};
+%typemap{CV *};
+
+%typemap{bool};
+%typemap{const bool};
+
+%typemap{ptrdiff_t};
+%typemap{const ptrdiff_t};
+%typemap{double};
+%typemap{const double};
+%typemap{std::vector<double>};
+%typemap{std::string};
+
