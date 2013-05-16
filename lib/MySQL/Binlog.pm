@@ -3,7 +3,35 @@ use 5.008;
 use strict;
 use warnings;
 
+use Carp qw(croak);
+use Exporter 'import';
+use MySQL::Binlog::Constants;
+use MySQL::Binlog::Event;
+
+our %EXPORT_TAGS = (
+  'constants' => \@MySQL::Binlog::Constants::Names,
+);
+our @EXPORT_OK = map {@$_} values %EXPORT_TAGS;
+$EXPORT_TAGS{all} = \@EXPORT_OK;
+
 our $VERSION = '0.01';
+
+sub AUTOLOAD {
+    # This AUTOLOAD is used to 'autoload' constants from the constant()
+    # XS function.
+
+    my $constname;
+    our $AUTOLOAD;
+    ($constname = $AUTOLOAD) =~ s/.*:://;
+    croak("&MySQL::Binlog::constant not defined") if $constname eq 'constant';
+    my ($error, $val) = constant($constname);
+    if ($error) { croak $error; }
+    {
+        no strict 'refs';
+        *$AUTOLOAD = sub { $val };
+    }
+    goto &$AUTOLOAD;
+}
 
 require XSLoader;
 XSLoader::load('MySQL::Binlog', $VERSION);

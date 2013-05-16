@@ -1,5 +1,34 @@
 ptrdiff_t			T_IV
 const ptrdiff_t			T_IV
+ulong				T_UV
+const ulong			T_UV
+uint				T_UV
+const uint			T_UV
+
+Log_event_type			T_IV
+User_var_event::Value_type	T_IV
+Row_event::enum_flag		T_IV
+Int_var_event::Int_event_type	T_IV
+
+Binary_log *			O_OBJECT
+Binary_log_driver *		O_OBJECT
+Dummy_driver *			O_OBJECT
+Log_event_header *		O_OBJECT
+Binary_log_event *		O_OBJECT
+Unknown_event *			O_OBJECT
+Query_event *			O_OBJECT
+Rotate_event *			O_OBJECT
+Format_event *			O_OBJECT
+User_var_event *		O_OBJECT
+Table_map_event *		O_OBJECT
+Row_event *			O_OBJECT
+Int_var_event *			O_OBJECT
+Incident_event *		O_OBJECT
+Xid *				O_OBJECT
+Binlog_file_driver *		O_OBJECT
+Binlog_tcp_driver *		O_OBJECT
+
+PerlOutFh			T_OUT
 
 INPUT
 

@@ -3,8 +3,12 @@
 %typemap{SV *};
 %typemap{CV *};
 
+%typemap{PerlOutFh};
+
 %typemap{bool};
 %typemap{const bool};
+%typemap{uint};
+%typemap{const uint};
 
 %typemap{ptrdiff_t};
 %typemap{const ptrdiff_t};
@@ -12,4 +16,12 @@
 %typemap{const double};
 %typemap{std::vector<double>};
 %typemap{std::string};
+%typemap{const std::string};
+%typemap{ulong};
+%typemap{const ulong};
+
+%typemap{Log_event_type};
+%typemap{User_var_event::Value_type};
+%typemap{Row_event::enum_flag};
+%typemap{Int_var_event::Int_event_type};
 

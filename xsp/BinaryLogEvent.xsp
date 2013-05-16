@@ -1,0 +1,221 @@
+%module{MySQL::Binlog};
+
+#undef VERSION
+#include <sstream>
+#include <binlog_event.h>
+#include <binlog_api.h>
+#include <perl_myinit.h>
+%package{MySQL::Binlog::Event};
+
+const char *get_event_type_str(Log_event_type type);
+
+%name{MySQL::Binlog::Event::Header}
+class Log_event_header {
+  Log_event_header();
+
+{%
+INCLUDE_COMMAND: $^X ../author_tools/gen_accessors.pl --class=Log_event_header --accessor='uint8_t,marker' --accessor='uint32_t,timestamp' --accessor='uint8_t,type_code' --accessor='uint32_t,server_id' --accessor='uint32_t,event_length' --accessor='uint32_t,next_position' --accessor='uint16_t,flags'
+%}
+
+}; // end class Log_event_header
+
+%name{MySQL::Binlog::Event}
+class Binary_log_event {
+  // Binary_log_event();
+  virtual ~Binary_log_event();
+
+  //%name{new_with_header}
+  //Binary_log_event(Log_event_header *header);
+
+  // virtual void print_event_info(std::ostream& info)=0;
+  SV *get_event_info() %code{%
+    std::stringstream ss;
+    try { THIS->print_event_info(ss); }
+    STD_EXCEPTION_CATCHERS
+    RETVAL = SSTREAM_TO_SV(ss);
+  %};
+
+  // Note: print_long_info implemented in Perl
+  // Note2: print_long_info also virtual but not necessarily absytact like print_event_info
+  SV *get_long_info() %code{%
+    std::stringstream ss;
+    try { THIS->print_long_info(ss); }
+    STD_EXCEPTION_CATCHERS
+    RETVAL = SSTREAM_TO_SV(ss);
+  %};
+
+  Log_event_type get_event_type() const;
+
+{%
+
+# // FIXME this can cause nasty ownership issues! Header might have to be wrapped and refcounted.
+
+Log_event_header *
+Binary_log_event::header()
+  PREINIT:
+    const char *CLASS = "MySQL::Binlog::Event::Header";
+  CODE:
+    try { RETVAL = THIS->header(); }
+    STD_EXCEPTION_CATCHERS
+  OUTPUT: RETVAL
+%}
+}; // end class Binary_log_event
+
+%name{MySQL::Binlog::Event::Unknown}
+class Unknown_event : public Binary_log_event {
+  Unknown_event(Log_event_header *header);
+  ~Unknown_event();
+
+  // Note: implementation in Perl based on inherited get_*_info which calls print_* under the hood
+  // void print_event_info(std::ostream& info); // in Perl
+  // void print_long_info(std::ostream& info); // in Perl
+};
+
+%name{MySQL::Binlog::Event::Query}
+class Query_event: public Binary_log_event {
+  Query_event(Log_event_header *header);
+  ~Query_event();
+{%
+INCLUDE_COMMAND: $^X ../author_tools/gen_accessors.pl --class=Query_event --accessor='std::string,db_name' --accessor='std::string,query' --accessor='uint32_t,thread_id' --accessor='uint32_t,exec_time' --accessor='uint16_t,error_code' --accessor='std::vector<uint8_t>,variables'
+%}
+
+  // Note: implementation in Perl based on inherited get_*_info which calls print_* under the hood
+  // void print_event_info(std::ostream& info);
+  // void print_long_info(std::ostream& info);
+}; // end class Query_event
+
+%name{MySQL::Binlog::Event::Rotate}
+class Rotate_event : public Binary_log_event {
+  Rotate_event(Log_event_header *header);
+  ~Rotate_event();
+
+{%
+INCLUDE_COMMAND: $^X ../author_tools/gen_accessors.pl --class=Rotate_event --accessor='std::string,binlog_file' --accessor='uint64_t,binlog_pos'
+%}
+
+  // Note: implementation in Perl based on inherited get_*_info which calls print_* under the hood
+  // void print_event_info(std::ostream& info);
+  // void print_long_info(std::ostream& info);
+}; // end class Rotate_event
+
+%name{MySQL::Binlog::Event::Format}
+class Format_event : public Binary_log_event {
+  Format_event(Log_event_header *header);
+  ~Format_event();
+
+{%
+INCLUDE_COMMAND: $^X ../author_tools/gen_accessors.pl --class=Format_event --accessor='std::string,master_version' --accessor='uint16_t,binlog_version' --accessor='uint32_t,created_ts' --accessor='uint8_t,log_header_len' --accessor='std::vector<uint8_t>,post_header_len'
+%}
+
+  // Note: implementation in Perl based on inherited get_*_info which calls print_* under the hood
+  // void print_event_info(std::ostream& info);
+  // void print_long_info(std::ostream& info);
+}; // end class Format_event
+
+%name{MySQL::Binlog::Event::UserVar}
+class User_var_event : public Binary_log_event {
+  User_var_event(Log_event_header *header);
+  ~User_var_event();
+
+{%
+INCLUDE_COMMAND: $^X ../author_tools/gen_accessors.pl --class=User_var_event --accessor='std::string,name' --accessor='std::string,value' --accessor='uint8_t,is_null' --accessor='uint8_t,type' --accessor='uint32_t,charset'
+%}
+
+  // Note: implementation in Perl based on inherited get_*_info which calls print_* under the hood
+  //void print_event_info(std::ostream& info);
+  //void print_long_info(std::ostream& info);
+
+  static std::string get_value_type_string(User_var_event::Value_type type);
+}; // end class User_var_event
+
+
+%name{MySQL::Binlog::Event::TableMap}
+class Table_map_event : public Binary_log_event {
+  Table_map_event(Log_event_header *header);
+  ~Table_map_event();
+
+{%
+INCLUDE_COMMAND: $^X ../author_tools/gen_accessors.pl --class=Table_map_event --accessor='std::string,db_name' --accessor='std::string,table_name' --accessor='uint64_t,table_id' --accessor='uint16_t,flags' --accessor='std::vector<uint8_t>,columns' --accessor='std::vector<uint8_t>,metadata' --accessor='std::vector<uint8_t>,null_bits'
+%}
+
+  // Note: implementation in Perl based on inherited get_*_info which calls print_* under the hood
+  //void print_event_info(std::ostream& info);
+  //void print_long_info(std::ostream& info);
+}; // end class Table_map_event
+
+
+%name{MySQL::Binlog::Event::Row}
+class Row_event: public Binary_log_event {
+  Row_event(Log_event_header *header);
+  ~Row_event();
+
+{%
+INCLUDE_COMMAND: $^X ../author_tools/gen_accessors.pl --class=Row_event --accessor='uint64_t,table_id' --accessor='uint16_t,flags' --accessor='uint64_t,columns_len' --accessor='uint32_t,null_bits_len' --accessor='uint16_t,var_header_len' --accessor='std::vector<uint8_t>,extra_header_data' --accessor='std::vector<uint8_t>,columns_before_image' --accessor='std::vector<uint8_t>,used_columns' --accessor='std::vector<uint8_t>,row'
+%}
+
+  static std::string get_flag_string(Row_event::enum_flag flag);
+
+  // Note: implementation in Perl based on inherited get_*_info which calls print_* under the hood
+  //void print_event_info(std::ostream& info);
+  //void print_long_info(std::ostream& info);
+}; // enc class Row_event
+
+
+%name{MySQL::Binlog::Event::IntVar}
+class Int_var_event : public Binary_log_event {
+  Int_var_event(Log_event_header *header);
+  ~Int_var_event();
+
+{%
+INCLUDE_COMMAND: $^X ../author_tools/gen_accessors.pl --class=Int_var_event --accessor='uint8_t,type' --accessor='uint64_t,value'
+%}
+
+  static std::string get_type_string(Int_var_event::Int_event_type type);
+
+  // Note: implementation in Perl based on inherited get_*_info which calls print_* under the hood
+  // void print_event_info(std::ostream& info);
+  // void print_long_info(std::ostream& info);
+}; // end class Int_var_event
+
+
+%name{MySQL::Binlog::Event::Incident}
+class Incident_event : public Binary_log_event {
+  Incident_event(Log_event_header *header);
+  //Incident_event();
+  ~Incident_event();
+
+{%
+INCLUDE_COMMAND: $^X ../author_tools/gen_accessors.pl --class=Incident_event --accessor='uint8_t,type' --accessor='std::string,message'
+%}
+
+  // Note: implementation in Perl based on inherited get_*_info which calls print_* under the hood
+  // void print_event_info(std::ostream& info);
+  // void print_long_info(std::ostream& info);
+}; // end class Incident_event
+
+%name{MySQL::Binlog::Event::Xid}
+class Xid : public Binary_log_event {
+  Xid(Log_event_header *header);
+  ~Xid();
+
+
+{%
+INCLUDE_COMMAND: $^X ../author_tools/gen_accessors.pl --class=Xid --accessor='uint64_t,xid_id'
+%}
+
+  // Note: implementation in Perl based on inherited get_*_info which calls print_* under the hood
+  // void print_event_info(std::ostream& info);
+  // void print_long_info(std::ostream& info);
+}; // end class Xid
+
+%package{MySQL::Binlog::Event};
+Binary_log_event *
+create_incident_event(unsigned int type,
+                      const char *message,
+                      unsigned long pos= 0)
+  %code{%
+    const char *CLASS = "MySQL::Binlog::Event::Incident"; // dirty trick - sneaky type cast
+    try { RETVAL = create_incident_event(type, message, pos); }
+    STD_EXCEPTION_CATCHERS
+  %};
+

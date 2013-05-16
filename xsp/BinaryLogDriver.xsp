@@ -1,0 +1,125 @@
+%module{MySQL::Binlog};
+
+#undef VERSION
+#include <binlog_driver.h>
+#include <binlog_api.h>
+#include <perl_myinit.h>
+
+%name{MySQL::Binlog::Driver}
+class Binary_log_driver {
+  // template <class FilenameT> Binary_log_driver(const FilenameT& filename = FilenameT(), unsigned int offset = 0);
+  ~Binary_log_driver();
+
+  // virtual int connect()= 0;
+  // %name{connect_filename} virtual int connect(const std::string &filename, ulong position)= 0;
+  // virtual int set_position(const std::string &str, unsigned long position)= 0;
+  // virtual int disconnect()= 0;
+
+
+  // FIXME this is kind of hard without FILE => istream conversion or similar!
+  // Binary_log_event* parse_event(std::istream &sbuff, Log_event_header *header);
+  
+{%
+
+# // technically an abstract method
+# // virtual int wait_for_next_event(mysql::Binary_log_event **event)= 0;
+
+void
+Binary_log_driver::wait_for_next_event()
+  PREINIT:
+    int status;
+    Binary_log_event **event_ptr = NULL;
+    SV *rv;
+  PPCODE:
+    try {
+      status = THIS->wait_for_next_event(event_ptr);
+    }
+    STD_EXCEPTION_CATCHERS
+    EXTEND(SP, 2);
+    PUSHs(sv_2mortal(newSViv(status)));
+    if (event_ptr == NULL) {
+      PUSHs(&PL_sv_undef);
+    }
+    else {
+      rv = sv_newmortal();
+      sv_setref_pv(ST(0), mbl_event_id_to_perl_class((IV)(*event_ptr)->get_event_type()), (void*)*event_ptr);
+      PUSHs(rv);
+    }
+    XSRETURN(2);
+
+%}
+
+  // technically an abstract method
+{%
+void
+Binary_log_driver::get_position()
+  PPCODE:
+    std::string str;
+    unsigned long position;
+    int rv;
+    try {
+      rv = THIS->get_position(&str, &position);
+    }
+    STD_EXCEPTION_CATCHERS
+    mXPUSHi(rv);
+    mXPUSHp(str.c_str(), str.length());
+    mXPUSHu(position);
+%}
+
+}; // end class Binary_log_driver
+
+%name{MySQL::Binlog::Driver::Dummy}
+class Dummy_driver : public Binary_log_driver {
+  Dummy_driver();
+  virtual ~Dummy_driver();
+
+  virtual int connect();
+  %name{connect_filename} virtual int connect(const std::string &filename, ulong position);
+  virtual int set_position(const std::string &str, unsigned long position);
+
+  // inherited
+  //virtual int wait_for_next_event(mysql::Binary_log_event **event);
+  //int get_position(std::string *str, unsigned long *position);
+
+  virtual int disconnect();
+}; // end class Dummy_driver
+
+
+
+%name{MySQL::Binlog::Driver::File}
+class Binlog_file_driver : public Binary_log_driver {
+  ~Binlog_file_driver();
+  Binlog_file_driver(std::string filename, unsigned int offset = 0);
+
+  int connect();
+  int disconnect();
+  int set_position(const std::string &str, unsigned long position);
+
+  %name{connect_filename} virtual int connect(const std::string &filename, ulong offset);
+
+  // inherited
+  //int get_position(std::string *str, unsigned long *position);
+  //int wait_for_next_event(mysql::Binary_log_event **event);
+}; // end class Binlog_file_driver
+
+
+class Binlog_tcp_driver : public Binary_log_driver
+{
+  Binlog_tcp_driver(const std::string& user, const std::string& passwd,
+                    const std::string& host, uint port);
+  ~Binlog_tcp_driver();
+
+  int connect();
+  %name{connect_filename} virtual int connect(const std::string &binlog_filename, ulong offset);
+  // inherited
+  // int wait_for_next_event(mysql::Binary_log_event **event);
+  // int get_position(std::string *str, unsigned long *position);
+
+  int set_position(const std::string &str, unsigned long position);
+  int disconnect();
+
+  const std::string& user() const;
+  const std::string& password() const;
+  const std::string& host() const;
+  uint port() const;
+}; // end class Binlog_tcp_driver

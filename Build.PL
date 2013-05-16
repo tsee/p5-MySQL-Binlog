@@ -11,6 +11,7 @@ my $build = Module::Build::WithXSpp->new(
     'ExtUtils::ParseXS' => '3.18',
     'ExtUtils::XSpp' => '0.1604',
   },
+  early_includes  => ['perl_myinit_early.h'],
   # Provides extra C typemaps for opaque objects:
   extra_typemap_modules => {
     'ExtUtils::Typemaps::Default' => '1.03',

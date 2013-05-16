@@ -1,0 +1,1 @@
+#define PERL_NO_GET_CONTEXT

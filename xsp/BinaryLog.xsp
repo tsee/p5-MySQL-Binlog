@@ -1,0 +1,85 @@
+%module{MySQL::Binlog};
+
+#undef VERSION
+#include <binlog_api.h>
+#include <perl_myinit.h>
+
+%package{MySQL::Binlog};
+
+const char *str_error(int error_no);
+
+%name{MySQL::Binlog}
+class Binary_log {
+  ~Binary_log();
+  //Binary_log(system::Binary_log_driver *drv);
+
+
+{%
+int
+Binary_log::connect(...)
+  CODE:
+    try {
+      if (items == 2) {
+        RETVAL = THIS->connect(SvUV(ST(1)));
+      }
+      else if (items == 1) {
+        RETVAL = THIS->connect();
+      }
+    }
+    STD_EXCEPTION_CATCHERS
+    if (items < 1 || items > 2)
+      croak("Invalid number of parameters to 'connect' call");
+  OUTPUT: RETVAL
+
+
+# // int wait_for_next_event(Binary_log_event **event);
+
+void
+Binary_log::wait_for_next_event()
+  PREINIT:
+    int status;
+    Binary_log_event **event_ptr = NULL;
+    SV *rv;
+  PPCODE:
+    try {
+      status = THIS->wait_for_next_event(event_ptr);
+    }
+    STD_EXCEPTION_CATCHERS
+    EXTEND(SP, 2);
+    PUSHs(sv_2mortal(newSViv(status)));
+    if (event_ptr == NULL) {
+      PUSHs(&PL_sv_undef);
+    }
+    else {
+      rv = sv_newmortal();
+      sv_setref_pv(ST(0), mbl_event_id_to_perl_class((IV)(*event_ptr)->get_event_type()), (void*)*event_ptr);
+      PUSHs(rv);
+    }
+    XSRETURN(2);
+
+%}
+
+  // Content_handler_pipeline *content_handler_pipeline();
+
+  %name{set_file_position} int set_position(const std::string &filename, unsigned long position);
+  %name{set_position} int set_position(unsigned long position);
+  %name{get_position} unsigned long get_position();
+
+{%
+void
+Binary_log::get_file_position()
+  PPCODE:
+    unsigned long position;
+    std::string filename;
+    try {
+      position = THIS->get_position(filename);
+    }
+    STD_EXCEPTION_CATCHERS
+    mXPUSHu(position);
+    mXPUSHp(filename.c_str(), (STRLEN)filename.length());
+%}
+
+  int disconnect();
+
+};
+
