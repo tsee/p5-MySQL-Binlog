@@ -103,6 +103,7 @@ class Binlog_file_driver : public Binary_log_driver {
 }; // end class Binlog_file_driver
 
 
+%name{MySQL::Binlog::Driver::TCP}
 class Binlog_tcp_driver : public Binary_log_driver
 {
   Binlog_tcp_driver(const std::string& user, const std::string& passwd,

@@ -24,4 +24,5 @@
 %typemap{User_var_event::Value_type};
 %typemap{Row_event::enum_flag};
 %typemap{Int_var_event::Int_event_type};
+%typemap{Binary_log_driver *};
 

@@ -11,8 +11,7 @@ const char *str_error(int error_no);
 %name{MySQL::Binlog}
 class Binary_log {
   ~Binary_log();
-  //Binary_log(system::Binary_log_driver *drv);
-
+  Binary_log(Binary_log_driver *drv);
 
 {%
 int
