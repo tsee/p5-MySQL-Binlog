@@ -34,6 +34,41 @@ typedef double NV; /* 5.6 and later define NVTYPE, and typedef NV to it.  */
 #endif
 
 static int
+constant_8 (pTHX_ const char *name, IV *iv_return) {
+  /* When generated this function returned values for the list of names given
+     here.  However, subsequent manual editing may have added or removed some.
+     ERR_FAIL INT_TYPE_td ROW_TYPE_td */
+  /* Offset 1 gives the best switch position.  */
+  switch (name[1]) {
+  case 'N':
+    if (memEQ(name, "INT_TYPE", 8)) {
+    /*                ^            */
+      *iv_return = INT_TYPE_td;
+      return PERL_constant_ISIV;
+
+    }
+    break;
+  case 'O':
+    if (memEQ(name, "ROW_TYPE", 8)) {
+    /*                ^            */
+      *iv_return = ROW_TYPE_td;
+      return PERL_constant_ISIV;
+
+    }
+    break;
+  case 'R':
+    if (memEQ(name, "ERR_FAIL", 8)) {
+    /*                ^            */
+      *iv_return = ERR_FAIL;
+      return PERL_constant_ISIV;
+
+    }
+    break;
+  }
+  return PERL_constant_NOTFOUND;
+}
+
+static int
 constant_10 (pTHX_ const char *name, IV *iv_return) {
   /* When generated this function returned values for the list of names given
      here.  However, subsequent manual editing may have added or removed some.
@@ -80,13 +115,21 @@ static int
 constant_11 (pTHX_ const char *name, IV *iv_return) {
   /* When generated this function returned values for the list of names given
      here.  However, subsequent manual editing may have added or removed some.
-     QUERY_EVENT SLAVE_EVENT STRING_TYPE_td */
+     ERR_CONNECT QUERY_EVENT SLAVE_EVENT STRING_TYPE_td */
   /* Offset 1 gives the best switch position.  */
   switch (name[1]) {
   case 'L':
     if (memEQ(name, "SLAVE_EVENT", 11)) {
     /*                ^                */
       *iv_return = SLAVE_EVENT;
+      return PERL_constant_ISIV;
+
+    }
+    break;
+  case 'R':
+    if (memEQ(name, "ERR_CONNECT", 11)) {
+    /*                ^                */
+      *iv_return = ERR_CONNECT;
       return PERL_constant_ISIV;
 
     }
@@ -258,47 +301,90 @@ constant_15 (pTHX_ const char *name, IV *iv_return) {
 }
 
 static int
+constant_16 (pTHX_ const char *name, IV *iv_return) {
+  /* When generated this function returned values for the list of names given
+     here.  However, subsequent manual editing may have added or removed some.
+     ERROR_CODE_COUNT VALUE_TYPE_COUNT_td WRITE_ROWS_EVENT */
+  /* Offset 3 gives the best switch position.  */
+  switch (name[3]) {
+  case 'O':
+    if (memEQ(name, "ERROR_CODE_COUNT", 16)) {
+    /*                  ^                   */
+      *iv_return = ERROR_CODE_COUNT;
+      return PERL_constant_ISIV;
+
+    }
+    break;
+  case 'T':
+    if (memEQ(name, "WRITE_ROWS_EVENT", 16)) {
+    /*                  ^                   */
+      *iv_return = WRITE_ROWS_EVENT;
+      return PERL_constant_ISIV;
+
+    }
+    break;
+  case 'U':
+    if (memEQ(name, "VALUE_TYPE_COUNT", 16)) {
+    /*                  ^                   */
+      *iv_return = VALUE_TYPE_COUNT_td;
+      return PERL_constant_ISIV;
+
+    }
+    break;
+  }
+  return PERL_constant_NOTFOUND;
+}
+
+static int
 constant_17 (pTHX_ const char *name, IV *iv_return) {
   /* When generated this function returned values for the list of names given
      here.  However, subsequent manual editing may have added or removed some.
-     CREATE_FILE_EVENT DELETE_FILE_EVENT DELETE_ROWS_EVENT INVALID_INT_EVENT_td
-     UPDATE_ROWS_EVENT */
-  /* Offset 1 gives the best switch position.  */
-  switch (name[1]) {
-  case 'E':
-    if (memEQ(name, "DELETE_FILE_EVENT", 17)) {
-    /*                ^                      */
+     CREATE_FILE_EVENT DELETE_FILE_EVENT DELETE_ROWS_EVENT ERR_PACKET_LENGTH
+     INVALID_INT_EVENT_td UPDATE_ROWS_EVENT */
+  /* Offset 0 gives the best switch position.  */
+  switch (*name++) {
+  case 'C':
+    if (memEQ(name, "REATE_FILE_EVENT", 16)) {
+    /*                C                       */
+      *iv_return = CREATE_FILE_EVENT;
+      return PERL_constant_ISIV;
+
+    }
+    break;
+  case 'D':
+    if (memEQ(name, "ELETE_FILE_EVENT", 16)) {
+    /*                D                       */
       *iv_return = DELETE_FILE_EVENT;
       return PERL_constant_ISIV;
 
     }
-    if (memEQ(name, "DELETE_ROWS_EVENT", 17)) {
-    /*                ^                      */
+    if (memEQ(name, "ELETE_ROWS_EVENT", 16)) {
+    /*                D                       */
       *iv_return = DELETE_ROWS_EVENT;
       return PERL_constant_ISIV;
 
     }
     break;
-  case 'N':
-    if (memEQ(name, "INVALID_INT_EVENT", 17)) {
-    /*                ^                      */
+  case 'E':
+    if (memEQ(name, "RR_PACKET_LENGTH", 16)) {
+    /*                E                       */
+      *iv_return = ERR_PACKET_LENGTH;
+      return PERL_constant_ISIV;
+
+    }
+    break;
+  case 'I':
+    if (memEQ(name, "NVALID_INT_EVENT", 16)) {
+    /*                I                       */
       *iv_return = INVALID_INT_EVENT_td;
       return PERL_constant_ISIV;
 
     }
     break;
-  case 'P':
-    if (memEQ(name, "UPDATE_ROWS_EVENT", 17)) {
-    /*                ^                      */
+  case 'U':
+    if (memEQ(name, "PDATE_ROWS_EVENT", 16)) {
+    /*                U                       */
       *iv_return = UPDATE_ROWS_EVENT;
-      return PERL_constant_ISIV;
-
-    }
-    break;
-  case 'R':
-    if (memEQ(name, "CREATE_FILE_EVENT", 17)) {
-    /*                ^                      */
-      *iv_return = CREATE_FILE_EVENT;
       return PERL_constant_ISIV;
 
     }
@@ -346,38 +432,52 @@ static int
 constant_20 (pTHX_ const char *name, IV *iv_return) {
   /* When generated this function returned values for the list of names given
      here.  However, subsequent manual editing may have added or removed some.
-     DELETE_ROWS_EVENT_V1 LAST_INSERT_ID_EVENT_td ROWS_QUERY_LOG_EVENT
-     UPDATE_ROWS_EVENT_V1 */
-  /* Offset 1 gives the best switch position.  */
-  switch (name[1]) {
-  case 'A':
+     DELETE_ROWS_EVENT_V1 ERR_CHECKSUM_ENABLED ERR_MYSQL_QUERY_FAIL
+     LAST_INSERT_ID_EVENT_td ROWS_QUERY_LOG_EVENT UPDATE_ROWS_EVENT_V1 */
+  /* Offset 8 gives the best switch position.  */
+  switch (name[8]) {
+  case 'E':
     if (memEQ(name, "LAST_INSERT_ID_EVENT", 20)) {
-    /*                ^                         */
+    /*                       ^                  */
       *iv_return = LAST_INSERT_ID_EVENT_td;
       return PERL_constant_ISIV;
 
     }
     break;
-  case 'E':
-    if (memEQ(name, "DELETE_ROWS_EVENT_V1", 20)) {
-    /*                ^                         */
-      *iv_return = DELETE_ROWS_EVENT_V1;
+  case 'K':
+    if (memEQ(name, "ERR_CHECKSUM_ENABLED", 20)) {
+    /*                       ^                  */
+      *iv_return = ERR_CHECKSUM_ENABLED;
+      return PERL_constant_ISIV;
+
+    }
+    break;
+  case 'L':
+    if (memEQ(name, "ERR_MYSQL_QUERY_FAIL", 20)) {
+    /*                       ^                  */
+      *iv_return = ERR_MYSQL_QUERY_FAIL;
       return PERL_constant_ISIV;
 
     }
     break;
   case 'O':
-    if (memEQ(name, "ROWS_QUERY_LOG_EVENT", 20)) {
-    /*                ^                         */
-      *iv_return = ROWS_QUERY_LOG_EVENT;
+    if (memEQ(name, "DELETE_ROWS_EVENT_V1", 20)) {
+    /*                       ^                  */
+      *iv_return = DELETE_ROWS_EVENT_V1;
+      return PERL_constant_ISIV;
+
+    }
+    if (memEQ(name, "UPDATE_ROWS_EVENT_V1", 20)) {
+    /*                       ^                  */
+      *iv_return = UPDATE_ROWS_EVENT_V1;
       return PERL_constant_ISIV;
 
     }
     break;
-  case 'P':
-    if (memEQ(name, "UPDATE_ROWS_EVENT_V1", 20)) {
-    /*                ^                         */
-      *iv_return = UPDATE_ROWS_EVENT_V1;
+  case 'R':
+    if (memEQ(name, "ROWS_QUERY_LOG_EVENT", 20)) {
+    /*                       ^                  */
+      *iv_return = ROWS_QUERY_LOG_EVENT;
       return PERL_constant_ISIV;
 
     }
@@ -390,28 +490,37 @@ static int
 constant_23 (pTHX_ const char *name, IV *iv_return) {
   /* When generated this function returned values for the list of names given
      here.  However, subsequent manual editing may have added or removed some.
-     NO_FOREIGN_KEY_CHECKS_F_td PRE_GA_WRITE_ROWS_EVENT RELAXED_UNIQUE_CHECKS_F_td */
-  /* Offset 0 gives the best switch position.  */
-  switch (*name++) {
-  case 'N':
-    if (memEQ(name, "O_FOREIGN_KEY_CHECKS_F", 22)) {
-    /*                N                             */
-      *iv_return = NO_FOREIGN_KEY_CHECKS_F_td;
-      return PERL_constant_ISIV;
-
-    }
-    break;
-  case 'P':
-    if (memEQ(name, "RE_GA_WRITE_ROWS_EVENT", 22)) {
-    /*                P                             */
+     ERR_CHECKSUM_QUERY_FAIL NO_FOREIGN_KEY_CHECKS_F_td PRE_GA_WRITE_ROWS_EVENT
+     RELAXED_UNIQUE_CHECKS_F_td */
+  /* Offset 11 gives the best switch position.  */
+  switch (name[11]) {
+  case 'E':
+    if (memEQ(name, "PRE_GA_WRITE_ROWS_EVENT", 23)) {
+    /*                          ^                  */
       *iv_return = PRE_GA_WRITE_ROWS_EVENT;
       return PERL_constant_ISIV;
 
     }
     break;
-  case 'R':
-    if (memEQ(name, "ELAXED_UNIQUE_CHECKS_F", 22)) {
-    /*                R                             */
+  case 'K':
+    if (memEQ(name, "NO_FOREIGN_KEY_CHECKS_F", 23)) {
+    /*                          ^                  */
+      *iv_return = NO_FOREIGN_KEY_CHECKS_F_td;
+      return PERL_constant_ISIV;
+
+    }
+    break;
+  case 'M':
+    if (memEQ(name, "ERR_CHECKSUM_QUERY_FAIL", 23)) {
+    /*                          ^                  */
+      *iv_return = ERR_CHECKSUM_QUERY_FAIL;
+      return PERL_constant_ISIV;
+
+    }
+    break;
+  case 'Q':
+    if (memEQ(name, "RELAXED_UNIQUE_CHECKS_F", 23)) {
+    /*                          ^                  */
       *iv_return = RELAXED_UNIQUE_CHECKS_F_td;
       return PERL_constant_ISIV;
 
@@ -502,12 +611,14 @@ my $types = {map {($_, 1)} qw(IV)};
 my @names = (qw(ANONYMOUS_GTID_LOG_EVENT APPEND_BLOCK_EVENT
 	       BEGIN_LOAD_QUERY_EVENT COMPLETE_ROWS_F_td CREATE_FILE_EVENT
 	       DECIMAL_TYPE_td DELETE_FILE_EVENT DELETE_ROWS_EVENT
-	       DELETE_ROWS_EVENT_V1 ENUM_END_EVENT EXECUTE_LOAD_QUERY_EVENT
-	       EXEC_LOAD_EVENT FORMAT_DESCRIPTION_EVENT GTID_LOG_EVENT
-	       HEARTBEAT_LOG_EVENT IGNORABLE_LOG_EVENT INCIDENT_EVENT
-	       INSERT_ID_EVENT_td INTVAR_EVENT INT_TYPE_td INVALID_INT_EVENT_td
-	       LAST_INSERT_ID_EVENT_td LOAD_EVENT NEW_LOAD_EVENT
-	       NO_FOREIGN_KEY_CHECKS_F_td PREVIOUS_GTIDS_LOG_EVENT
+	       DELETE_ROWS_EVENT_V1 ENUM_END_EVENT ERROR_CODE_COUNT
+	       ERR_BINLOG_VERSION ERR_CHECKSUM_ENABLED ERR_CHECKSUM_QUERY_FAIL
+	       ERR_CONNECT ERR_EOF ERR_FAIL ERR_MYSQL_QUERY_FAIL ERR_OK
+	       ERR_PACKET_LENGTH EXECUTE_LOAD_QUERY_EVENT EXEC_LOAD_EVENT
+	       FORMAT_DESCRIPTION_EVENT GTID_LOG_EVENT HEARTBEAT_LOG_EVENT
+	       IGNORABLE_LOG_EVENT INCIDENT_EVENT INSERT_ID_EVENT_td INTVAR_EVENT
+	       INT_TYPE_td INVALID_INT_EVENT_td LAST_INSERT_ID_EVENT_td LOAD_EVENT
+	       NEW_LOAD_EVENT NO_FOREIGN_KEY_CHECKS_F_td PREVIOUS_GTIDS_LOG_EVENT
 	       PRE_GA_DELETE_ROWS_EVENT PRE_GA_UPDATE_ROWS_EVENT
 	       PRE_GA_WRITE_ROWS_EVENT QUERY_EVENT RAND_EVENT REAL_TYPE_td
 	       RELAXED_UNIQUE_CHECKS_F_td ROTATE_EVENT ROWS_QUERY_LOG_EVENT
@@ -526,28 +637,22 @@ __END__
    */
 
   switch (len) {
-  case 8:
-    /* Names all of length 8.  */
-    /* INT_TYPE_td ROW_TYPE_td */
-    /* Offset 1 gives the best switch position.  */
-    switch (name[1]) {
-    case 'N':
-      if (memEQ(name, "INT_TYPE", 8)) {
-      /*                ^            */
-        *iv_return = INT_TYPE_td;
-        return PERL_constant_ISIV;
+  case 6:
+    if (memEQ(name, "ERR_OK", 6)) {
+      *iv_return = ERR_OK;
+      return PERL_constant_ISIV;
 
-      }
-      break;
-    case 'O':
-      if (memEQ(name, "ROW_TYPE", 8)) {
-      /*                ^            */
-        *iv_return = ROW_TYPE_td;
-        return PERL_constant_ISIV;
-
-      }
-      break;
     }
+    break;
+  case 7:
+    if (memEQ(name, "ERR_EOF", 7)) {
+      *iv_return = ERR_EOF;
+      return PERL_constant_ISIV;
+
+    }
+    break;
+  case 8:
+    return constant_8 (aTHX_ name, iv_return);
     break;
   case 9:
     /* Names all of length 9.  */
@@ -595,36 +700,32 @@ __END__
     return constant_15 (aTHX_ name, iv_return);
     break;
   case 16:
-    /* Names all of length 16.  */
-    /* VALUE_TYPE_COUNT_td WRITE_ROWS_EVENT */
-    /* Offset 0 gives the best switch position.  */
-    switch (*name++) {
-    case 'V':
-      if (memEQ(name, "ALUE_TYPE_COUNT", 15)) {
-      /*                V                      */
-        *iv_return = VALUE_TYPE_COUNT_td;
-        return PERL_constant_ISIV;
-
-      }
-      break;
-    case 'W':
-      if (memEQ(name, "RITE_ROWS_EVENT", 15)) {
-      /*                W                      */
-        *iv_return = WRITE_ROWS_EVENT;
-        return PERL_constant_ISIV;
-
-      }
-      break;
-    }
+    return constant_16 (aTHX_ name, iv_return);
     break;
   case 17:
     return constant_17 (aTHX_ name, iv_return);
     break;
   case 18:
-    if (memEQ(name, "APPEND_BLOCK_EVENT", 18)) {
-      *iv_return = APPEND_BLOCK_EVENT;
-      return PERL_constant_ISIV;
+    /* Names all of length 18.  */
+    /* APPEND_BLOCK_EVENT ERR_BINLOG_VERSION */
+    /* Offset 16 gives the best switch position.  */
+    switch (name[16]) {
+    case 'N':
+      if (memEQ(name, "APPEND_BLOCK_EVENT", 18)) {
+      /*                               ^        */
+        *iv_return = APPEND_BLOCK_EVENT;
+        return PERL_constant_ISIV;
 
+      }
+      break;
+    case 'O':
+      if (memEQ(name, "ERR_BINLOG_VERSION", 18)) {
+      /*                               ^        */
+        *iv_return = ERR_BINLOG_VERSION;
+        return PERL_constant_ISIV;
+
+      }
+      break;
     }
     break;
   case 19:

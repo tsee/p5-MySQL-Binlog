@@ -82,6 +82,19 @@ my @consts = (
     LAST_INSERT_ID_EVENT
     INSERT_ID_EVENT
   )),
+  # enum Error_code in binlog_api.h
+  qw(
+    ERR_OK
+    ERR_EOF
+    ERR_FAIL
+    ERR_CHECKSUM_ENABLED
+    ERR_CHECKSUM_QUERY_FAIL
+    ERR_CONNECT
+    ERR_BINLOG_VERSION
+    ERR_PACKET_LENGTH
+    ERR_MYSQL_QUERY_FAIL
+    ERROR_CODE_COUNT
+  ),
 );
 
 my $realNamespace = 'MySQL::Binlog';
