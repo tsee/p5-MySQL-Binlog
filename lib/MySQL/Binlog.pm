@@ -10,6 +10,7 @@ use MySQL::Binlog::Event;
 
 our %EXPORT_TAGS = (
   'constants' => \@MySQL::Binlog::Constants::Names,
+  'functions' => [qw(str_error create_transport)],
 );
 our @EXPORT_OK = map {@$_} values %EXPORT_TAGS;
 $EXPORT_TAGS{all} = \@EXPORT_OK;
@@ -17,24 +18,52 @@ $EXPORT_TAGS{all} = \@EXPORT_OK;
 our $VERSION = '0.01';
 
 sub AUTOLOAD {
-    # This AUTOLOAD is used to 'autoload' constants from the constant()
-    # XS function.
+  # This AUTOLOAD is used to 'autoload' constants from the constant()
+  # XS function.
 
-    my $constname;
-    our $AUTOLOAD;
-    ($constname = $AUTOLOAD) =~ s/.*:://;
-    croak("&MySQL::Binlog::constant not defined") if $constname eq 'constant';
-    my ($error, $val) = constant($constname);
-    if ($error) { croak $error; }
-    {
-        no strict 'refs';
-        *$AUTOLOAD = sub { $val };
-    }
-    goto &$AUTOLOAD;
+  my $constname;
+  our $AUTOLOAD;
+  ($constname = $AUTOLOAD) =~ s/.*:://;
+  croak("&MySQL::Binlog::constant not defined") if $constname eq 'constant';
+  my ($error, $val) = constant($constname);
+  if ($error) { croak $error; }
+  {
+    no strict 'refs';
+    *$AUTOLOAD = sub { $val };
+  }
+  goto &$AUTOLOAD;
 }
 
 require XSLoader;
 XSLoader::load('MySQL::Binlog', $VERSION);
+
+SCOPE: {
+  # Reimplemented in Perl because:
+  # a) Perl is better at this than C
+  # b) We retain full object type information!
+  sub create_transport {
+    my $url = shift;
+    if ($url =~ m/^mysql:\/\/
+                  ([^\s\@:]+) # user
+                  (?:
+                    : ([^\s\@]+)
+                  )? # optional password
+                  \@([^\s:]+) # host
+                  :([0-9]+) # port
+                  $
+                  /x)
+    {
+      my ($user, $pass, $host, $port) = ($1, $2, $3, $4);
+      return MySQL::Binlog::Driver::TCP->new($user, $pass, $host, $port);
+    }
+    elsif ($url =~ /^file:\/\/(\/.*)$/) {
+      return MySQL::Binlog::Driver::File->new($1);
+    }
+    else {
+      die "Unable to create transport from URL '$url'";
+    }
+  }
+} # end SCOPE
 
 1;
 __END__
