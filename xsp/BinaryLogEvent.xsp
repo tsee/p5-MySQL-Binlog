@@ -48,16 +48,45 @@ class Binary_log_event {
 
 {%
 
-# // FIXME this can cause nasty ownership issues! Header might have to be wrapped and refcounted.
-
-Log_event_header *
-Binary_log_event::header()
+void
+Binary_log_event::header(...)
   PREINIT:
     const char *CLASS = "MySQL::Binlog::Event::Header";
+  PPCODE:
+    if (items > 1) {
+      Log_event_header *hdr;
+      if( sv_isobject(ST(1)) && (SvTYPE(SvRV(ST(1))) == SVt_PVMG) )
+        hdr = (Log_event_header *)SvIV((SV*)SvRV(ST(1)));
+      else {
+        warn( "MySQL::Binlog::Event::header($var) -- $var is not a blessed SV reference" );
+        XSRETURN_UNDEF;
+      }
+      try {
+        *(THIS->header()) = *hdr;
+        PUSHs(ST(1));
+        XSRETURN(1);
+      }
+      STD_EXCEPTION_CATCHERS
+    }
+    else {
+      SV *retval = sv_newmortal();
+      try {
+        Log_event_header *hdr = new Log_event_header();
+        *hdr = *(THIS->header());
+	sv_setref_pv( retval, CLASS, (void*)hdr );
+      }
+      STD_EXCEPTION_CATCHERS
+      PUSHs(retval);
+      XSRETURN(1);
+    }
+    XSRETURN_EMPTY;
+
+void
+Binary_log_event::set_header(Log_event_header *hdr)
   CODE:
-    try { RETVAL = THIS->header(); }
+    try { *(THIS->header()) = *hdr; }
     STD_EXCEPTION_CATCHERS
-  OUTPUT: RETVAL
+
 %}
 }; // end class Binary_log_event
 

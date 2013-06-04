@@ -34,11 +34,10 @@ SCOPE: {
   my $h = $inc_event->header();
   isa_ok($h, 'MySQL::Binlog::Event::Header');
   $h->next_position(123);
+  $inc_event->header($h);
   my $h2 = $inc_event->header();
   isa_ok($h2, 'MySQL::Binlog::Event::Header');
   is($h2->next_position, 123, "Header has same data multiple times");
-
-  exit;
 }
 
 pass("Alive after destructors");
