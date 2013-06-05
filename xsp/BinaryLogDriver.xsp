@@ -26,26 +26,23 @@ class Binary_log_driver {
 
 void
 Binary_log_driver::wait_for_next_event()
-  PREINIT:
-    int status;
-    Binary_log_event **event_ptr = NULL;
-    SV *rv;
   PPCODE:
+    int status;
+    Binary_log_event *event_ptr = NULL;
     try {
-      status = THIS->wait_for_next_event(event_ptr);
+      status = THIS->wait_for_next_event(&event_ptr);
     }
     STD_EXCEPTION_CATCHERS
+
     EXTEND(SP, 2);
     PUSHs(sv_2mortal(newSViv(status)));
-    if (event_ptr == NULL) {
+    if (event_ptr == NULL)
       PUSHs(&PL_sv_undef);
-    }
     else {
-      rv = sv_newmortal();
-      sv_setref_pv(ST(0), mbl_event_id_to_perl_class((IV)(*event_ptr)->get_event_type()), (void*)*event_ptr);
+      SV *rv = sv_newmortal();
+      sv_setref_pv(rv, mbl_event_id_to_perl_class((IV)event_ptr->get_event_type()), (void*)event_ptr);
       PUSHs(rv);
     }
-    XSRETURN(2);
 
 %}
 
