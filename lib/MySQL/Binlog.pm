@@ -36,6 +36,7 @@ sub AUTOLOAD {
 
 require XSLoader;
 XSLoader::load('MySQL::Binlog', $VERSION);
+MySQL::Binlog::setup_event_inheritance(); # must be after XSLoader::load and "use ...Constants"
 
 SCOPE: {
   # Reimplemented in Perl because:

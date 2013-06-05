@@ -117,7 +117,18 @@ package
 HERE
 print $fh "sub $_;\n" for @sanitary_consts;
 
+print $fh "\nSCOPE:{\n  my \@event_classes = ('" . join("', '", sort values(%event_types_classes)) . "');\n";
 print $fh <<HERE;
+
+  sub setup_event_inheritance {
+    no strict 'refs';
+    foreach my \$class (\@event_classes) {
+      if (not \$class->isa("MySQL::Binlog::Event")) {
+        push \@{\$class . "::ISA"}, "MySQL::Binlog::Event";
+      }
+    }
+  }
+} # end SCOPE
 
 package
   $loadNamespace;

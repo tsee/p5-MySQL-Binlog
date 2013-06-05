@@ -69,6 +69,19 @@ sub ERR_PACKET_LENGTH;
 sub ERR_MYSQL_QUERY_FAIL;
 sub ERROR_CODE_COUNT;
 
+SCOPE:{
+  my @event_classes = ('MySQL::Binlog::Event::AnonymousGtidLog', 'MySQL::Binlog::Event::AppendBlock', 'MySQL::Binlog::Event::BeginLoadQuery', 'MySQL::Binlog::Event::CreateFile', 'MySQL::Binlog::Event::DeleteFile', 'MySQL::Binlog::Event::DeleteRows', 'MySQL::Binlog::Event::DeleteRowsV1', 'MySQL::Binlog::Event::EnumEnd', 'MySQL::Binlog::Event::ExecLoad', 'MySQL::Binlog::Event::ExecuteLoadQuery', 'MySQL::Binlog::Event::Format', 'MySQL::Binlog::Event::GtidLog', 'MySQL::Binlog::Event::HeartbeatLog', 'MySQL::Binlog::Event::IgnorableLog', 'MySQL::Binlog::Event::Incident', 'MySQL::Binlog::Event::IntVar', 'MySQL::Binlog::Event::Load', 'MySQL::Binlog::Event::NewLoad', 'MySQL::Binlog::Event::PreGaDeleteRows', 'MySQL::Binlog::Event::PreGaUpdateRows', 'MySQL::Binlog::Event::PreGaWriteRows', 'MySQL::Binlog::Event::PreviousGtidsLog', 'MySQL::Binlog::Event::Query', 'MySQL::Binlog::Event::Rand', 'MySQL::Binlog::Event::Rotate', 'MySQL::Binlog::Event::RowsQueryLog', 'MySQL::Binlog::Event::Slave', 'MySQL::Binlog::Event::StartV3', 'MySQL::Binlog::Event::Stop', 'MySQL::Binlog::Event::TableMap', 'MySQL::Binlog::Event::Unknown', 'MySQL::Binlog::Event::UpdateRows', 'MySQL::Binlog::Event::UpdateRowsV1', 'MySQL::Binlog::Event::UserDefined', 'MySQL::Binlog::Event::UserVar', 'MySQL::Binlog::Event::WriteRows', 'MySQL::Binlog::Event::WriteRowsV1', 'MySQL::Binlog::Event::Xid');
+
+  sub setup_event_inheritance {
+    no strict 'refs';
+    foreach my $class (@event_classes) {
+      if (not $class->isa("MySQL::Binlog::Event")) {
+        push @{$class . "::ISA"}, "MySQL::Binlog::Event";
+      }
+    }
+  }
+} # end SCOPE
+
 package
   MySQL::Binlog::Constants;
 1;
