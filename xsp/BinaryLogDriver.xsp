@@ -103,8 +103,8 @@ class Binlog_file_driver : public Binary_log_driver {
 %name{MySQL::Binlog::Driver::TCP}
 class Binlog_tcp_driver : public Binary_log_driver
 {
-  Binlog_tcp_driver(const std::string& user, const std::string& passwd,
-                    const std::string& host, uint port);
+  Binlog_tcp_driver(std::string user, std::string passwd,
+                    std::string host, uint port);
   ~Binlog_tcp_driver();
 
   int connect();
